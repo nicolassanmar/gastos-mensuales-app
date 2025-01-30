@@ -1,4 +1,3 @@
-import { ExpenseRecord } from "@prisma/client";
 import * as XLSX from "xlsx";
 import { Bank, SheetExpenseRecord } from "../types";
 import { string } from "zod";
@@ -26,38 +25,42 @@ const startsWithOne = (string: string, prefixes: string[]): boolean => {
 };
 
 const parseType = (
-  _concept: string,
+  concept: string,
   bank: SheetExpenseRecord["bank"],
 ): SheetExpenseRecord["type"] => {
-  const concept = _concept.toLowerCase();
+  const conceptLower = concept.toLowerCase();
   switch (bank) {
     case "ITAU":
-      if (startsWithOne(concept, ["compra", "rediva"])) return "compra";
+      if (startsWithOne(conceptLower, ["compra", "rediva"])) return "compra";
       if (
-        concept.startsWith("traspaso") ||
-        startsWithOne(concept, ["cre. cambio", "deb. cambio"])
+        conceptLower.startsWith("traspaso") ||
+        startsWithOne(conceptLower, ["cre. cambio", "deb. cambio"])
       )
         return "transferencia";
 
       if (
-        startsWithOne(concept, ["deb. varios", "cre. varios", "cre.varios"])
+        startsWithOne(conceptLower, [
+          "deb. varios",
+          "cre. varios",
+          "cre.varios",
+        ])
       ) {
         return "inversion";
       }
       break;
     case "SCOTIABANK":
       if (
-        startsWithOne(concept, ["com giro", "giro rec"]) ||
-        concept.includes("/trn/")
+        startsWithOne(conceptLower, ["com giro", "giro rec"]) ||
+        conceptLower.includes("/trn/")
       )
         return "transferencia";
-      if (concept.startsWith("CAMBIO MONEDA")) return "cambio-moneda";
+      if (conceptLower.startsWith("CAMBIO MONEDA")) return "cambio-moneda";
       break;
     case "SANTANDER":
       // pago caja profesionales
-      if (concept.includes("cjppu")) return "compra";
+      if (conceptLower.includes("cjppu")) return "compra";
       if (
-        startsWithOne(concept, [
+        startsWithOne(conceptLower, [
           "debito operacion en supernet o sms",
           "credito por operacion",
         ])

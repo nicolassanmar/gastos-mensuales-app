@@ -1,5 +1,6 @@
 import "~/styles/globals.css";
 import { Inter } from "next/font/google";
+import { TRPCReactProvider } from "~/trpc/react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -7,6 +8,10 @@ export const metadata = {
   title: "Monitor de gastos",
   description: "Aplicación para monitorear tus gastos",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
+};
+
+const Providers = ({ children }: { children: React.ReactNode }) => {
+  return <TRPCReactProvider>{children}</TRPCReactProvider>;
 };
 
 export default function RootLayout({
@@ -19,7 +24,9 @@ export default function RootLayout({
       <body
         className={`${inter.className} min-h-screen bg-gradient-to-br from-purple-400 via-pink-500 to-red-500`}
       >
-        <div className="container mx-auto px-4 py-8">{children}</div>
+        <div className="container mx-auto px-4 py-8">
+          <Providers>{children}</Providers>
+        </div>
       </body>
     </html>
   );

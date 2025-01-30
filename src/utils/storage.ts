@@ -1,10 +1,10 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, UseQueryResult } from "@tanstack/react-query";
 import { SheetExpenseRecord } from "./types";
 import { openDB, deleteDB, wrap, unwrap, DBSchema } from "idb";
 
 const expensesDBKey = "ExpensesDB";
 const expensesStoreKey = "expenses";
-const expensesQueryKey = "expenses";
+const expensesQueryKey = ["expenses"];
 
 interface ExpensesDB extends DBSchema {
   [expensesStoreKey]: {
@@ -34,7 +34,7 @@ export const compute_expense_id = (expense: SheetExpenseRecord): string => {
 
 /** Will add all the expenses to the DB. Will not create duplicate entries */
 export async function writeExpensesToDB(
-  expenses: SheetExpenseRecord[]
+  expenses: SheetExpenseRecord[],
 ): Promise<void> {
   try {
     const db = await openExpensesDB();
@@ -90,21 +90,24 @@ export function useExpensesFromDB(): UseQueryResult<{
   expensesUSD: SheetExpenseRecord[];
   expensesUYU: SheetExpenseRecord[];
 }> {
-  return useQuery([expensesQueryKey], async () => {
-    const db = await openExpensesDB();
-    const expensesUSD = await db.getAllFromIndex(
-      expensesStoreKey,
-      "by-currency-date",
-      IDBKeyRange.upperBound(["UYU", new Date(0)], true)
-    );
-    const expensesUYU = await db.getAllFromIndex(
-      expensesStoreKey,
-      "by-currency-date",
-      IDBKeyRange.lowerBound(["USD", new Date()], true)
-    );
-    return {
-      expensesUSD: filterExpenses(expensesUSD),
-      expensesUYU: filterExpenses(expensesUYU),
-    };
+  return useQuery({
+    queryKey: expensesQueryKey,
+    queryFn: async () => {
+      const db = await openExpensesDB();
+      const expensesUSD = await db.getAllFromIndex(
+        expensesStoreKey,
+        "by-currency-date",
+        IDBKeyRange.upperBound(["UYU", new Date(0)], true),
+      );
+      const expensesUYU = await db.getAllFromIndex(
+        expensesStoreKey,
+        "by-currency-date",
+        IDBKeyRange.lowerBound(["USD", new Date()], true),
+      );
+      return {
+        expensesUSD: filterExpenses(expensesUSD),
+        expensesUYU: filterExpenses(expensesUYU),
+      };
+    },
   });
 }
