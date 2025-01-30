@@ -105,8 +105,9 @@ export function useExpensesFromDB(): UseQueryResult<{
         IDBKeyRange.lowerBound(["USD", new Date()], true),
       );
       return {
-        expensesUSD: filterExpenses(expensesUSD),
-        expensesUYU: filterExpenses(expensesUYU),
+        // return most recent expenses first
+        expensesUSD: filterExpenses(expensesUSD).reverse(),
+        expensesUYU: filterExpenses(expensesUYU).reverse(),
       };
     },
   });

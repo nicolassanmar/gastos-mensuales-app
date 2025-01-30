@@ -24,6 +24,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "./ui/pagination";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 
 const noDecimalFormatter = Intl.NumberFormat(undefined, {
   maximumFractionDigits: 0,
@@ -125,7 +126,7 @@ const PaginationControls: React.FC<{ table: Table<SheetExpenseRecord> }> = ({
     </Pagination>
   );
 };
-export const ExpensesTable: React.FC<{ expenses: SheetExpenseRecord[] }> = ({
+const ExpensesTable: React.FC<{ expenses: SheetExpenseRecord[] }> = ({
   expenses,
 }) => {
   const table = useReactTable({
@@ -185,5 +186,27 @@ export const ExpensesTable: React.FC<{ expenses: SheetExpenseRecord[] }> = ({
       </table>
       <PaginationControls table={table} />
     </div>
+  );
+};
+
+export const ExpensesTableWithTabs: React.FC<{
+  expensesUYU: SheetExpenseRecord[];
+  expensesUSD: SheetExpenseRecord[];
+}> = ({ expensesUSD, expensesUYU }) => {
+  return (
+    <>
+      <Tabs defaultValue="UYU">
+        <TabsList>
+          <TabsTrigger value="UYU">UYU</TabsTrigger>
+          <TabsTrigger value="USD">USD</TabsTrigger>
+        </TabsList>
+        <TabsContent value="UYU">
+          <ExpensesTable expenses={expensesUYU} />
+        </TabsContent>
+        <TabsContent value="USD">
+          <ExpensesTable expenses={expensesUSD} />
+        </TabsContent>
+      </Tabs>
+    </>
   );
 };
