@@ -35,8 +35,12 @@ const columns = [
     header: "Concepto",
   }),
   columnHelper.accessor("amount", {
-    header: () => <th className="text-right">Monto</th>,
-    cell: ({ row }) => <ExpenseBadge amount={row.original.amount} />,
+    header: "Monto",
+    cell: ({ row }) => (
+      <div className="text-right">
+        <ExpenseBadge amount={row.original.amount} />
+      </div>
+    ),
   }),
   columnHelper.accessor("currency", {
     header: "Moneda",
