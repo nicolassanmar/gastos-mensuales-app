@@ -44,3 +44,8 @@ yarn-error.log*
 
 # idea files
 .idea
+
+# App specific
+## Folders to store excel files alongside the project
+descargas/*
+downloads/*
