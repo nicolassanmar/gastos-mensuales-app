@@ -57,8 +57,8 @@ export const FileDropdown = () => {
         {...getRootProps()}
         className={`cursor-pointer rounded-lg border-2 border-dashed p-8 text-center transition-all duration-300 ${
           isDragActive
-            ? "scale-105 border-primary bg-primary/10"
-            : "hover:scale-102 border-white bg-white/10 backdrop-blur-xl hover:border-primary"
+            ? "scale-105 border-red-200 bg-primary/10"
+            : "hover:scale-102 border-white bg-white/10 backdrop-blur-xl hover:border-red-200 hover:bg-white/20"
         }`}
       >
         <input {...getInputProps()} />

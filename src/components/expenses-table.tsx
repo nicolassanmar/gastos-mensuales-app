@@ -80,63 +80,6 @@ const columns = [
   }),
 ];
 
-const PaginationControls: React.FC<{ table: Table<SheetExpenseRecord> }> = ({
-  table,
-}) => {
-  const currentPage = table.getState().pagination.pageIndex;
-  const totalPages = table.getPageCount();
-
-  const pagesToShow = 5;
-  const startPage = Math.max(0, currentPage - 2);
-  const endPage = Math.min(totalPages - 1, startPage + pagesToShow - 1);
-  const pageNumbers = Array.from(
-    { length: endPage - startPage + 1 },
-    (_, i) => startPage + i,
-  );
-
-  return (
-    <Pagination className="gap-4 p-2">
-      <PaginationContent>
-        <PaginationItem>
-          <PaginationLink
-            onClick={() => table.setPageIndex(0)}
-            className={currentPage === 0 ? "opacity-50" : ""}
-          >
-            <ChevronsLeft className="h-4 w-4" />
-          </PaginationLink>
-        </PaginationItem>
-
-        <PaginationPrevious
-          onClick={() => table.previousPage()}
-          className={table.getCanPreviousPage() ? "" : "opacity-50"}
-        />
-        {pageNumbers.map((pageIndex) => (
-          <PaginationItem key={pageIndex}>
-            <PaginationLink
-              onClick={() => table.setPageIndex(pageIndex)}
-              isActive={pageIndex === currentPage}
-            >
-              {pageIndex + 1}
-            </PaginationLink>
-          </PaginationItem>
-        ))}
-        <PaginationNext
-          onClick={() => table.nextPage()}
-          className={table.getCanNextPage() ? "" : "opacity-50"}
-        />
-
-        <PaginationItem>
-          <PaginationLink
-            onClick={() => table.setPageIndex(totalPages - 1)}
-            className={currentPage === totalPages - 1 ? "opacity-50" : ""}
-          >
-            <ChevronsRight className="h-4 w-4" />
-          </PaginationLink>
-        </PaginationItem>
-      </PaginationContent>
-    </Pagination>
-  );
-};
 const ExpensesTable: React.FC<{ expenses: SheetExpenseRecord[] }> = ({
   expenses,
 }) => {
@@ -144,14 +87,14 @@ const ExpensesTable: React.FC<{ expenses: SheetExpenseRecord[] }> = ({
     data: expenses,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
   });
 
   console.log("🚀 ~ table:", table.getRowModel().rows);
 
   return (
-    <div className="bg-white">
-      <table className="min-w-full divide-y divide-gray-200">
+    // TODO: Wrap in flex to fill 100% height
+    <div className="~max-h-[40rem]/[36rem] overflow-auto bg-white">
+      <table className="min-w-full divide-y divide-gray-200 overflow-y-auto">
         <thead className="bg-gray-50">
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
@@ -195,15 +138,15 @@ const ExpensesTable: React.FC<{ expenses: SheetExpenseRecord[] }> = ({
           ))}
         </tbody>
       </table>
-      <PaginationControls table={table} />
     </div>
   );
 };
 
 export const ExpensesTableWithTabs: React.FC = () => {
-  const [selectedMonthYear, setSelectedMonthYear] = useState<string | null>(
-    null,
+  const [selectedMonthYear, setSelectedMonthYear] = useState<string>(
+    new Date().toISOString().slice(0, 7),
   );
+  const { data, isLoading } = useExpensesFromDB();
 
   const [selectedExpensesUYU, setSelectedExpensesUYU] = useState<
     SheetExpenseRecord[]
@@ -213,7 +156,22 @@ export const ExpensesTableWithTabs: React.FC = () => {
     SheetExpenseRecord[]
   >([]);
 
-  const { data, isLoading } = useExpensesFromDB();
+  useEffect(() => {
+    if (data) {
+      // TODO: Fix inefficient filtering here using a map
+      setSelectedExpensesUYU(
+        data.expensesUYU.find(
+          (expense) => expense.yearMonth === selectedMonthYear,
+        )?.expenses ?? [],
+      );
+      setSelectedExpensesUSD(
+        data.expensesUSD.find(
+          (expense) => expense.yearMonth === selectedMonthYear,
+        )?.expenses ?? [],
+      );
+    }
+  }, [selectedMonthYear, data]);
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -227,7 +185,6 @@ export const ExpensesTableWithTabs: React.FC = () => {
     ...expensesUYU.map((expense) => expense.yearMonth),
     ...expensesUSD.map((expense) => expense.yearMonth),
   ]);
-  console.log("🚀 ~ yearMonthSet:", yearMonthSet);
 
   const sortedMonthYears = Array.from(yearMonthSet)
     .map((yearMonth) => ({
@@ -237,7 +194,10 @@ export const ExpensesTableWithTabs: React.FC = () => {
     }))
     .sort((a, b) => b.date.getTime() - a.date.getTime());
 
-  console.log("🚀 ~ sortedMonthYears:", sortedMonthYears);
+  if (!sortedMonthYears[0]) {
+    return <div>No expenses found</div>;
+  }
+
   return (
     <>
       <Tabs defaultValue="UYU">
@@ -252,15 +212,6 @@ export const ExpensesTableWithTabs: React.FC = () => {
             defaultValue={sortedMonthYears[0].key}
             onValueChange={(value) => {
               setSelectedMonthYear(value);
-              // TODO: Fix inefficient filtering here using a map
-              setSelectedExpensesUYU(
-                expensesUYU.find((expense) => expense.yearMonth === value)
-                  ?.expenses ?? [],
-              );
-              setSelectedExpensesUSD(
-                expensesUSD.find((expense) => expense.yearMonth === value)
-                  ?.expenses ?? [],
-              );
             }}
           >
             <SelectTrigger className="w-[180px] bg-white">
