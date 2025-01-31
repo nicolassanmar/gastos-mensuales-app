@@ -25,7 +25,7 @@ import {
   PaginationPrevious,
 } from "./ui/pagination";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useExpensesFromDB, UseExpensesFromDBResult } from "~/utils/storage";
 import {
   Select,
@@ -80,6 +80,72 @@ const columns = [
   }),
 ];
 
+const useExpenseSummary = (expenses: SheetExpenseRecord[]) => {
+  return useMemo(() => {
+    const totalCompra = expenses
+      .filter((expense) => expense.type === "compra")
+      .reduce((acc, expense) => acc + expense.amount, 0);
+    const totalTransferencias = expenses
+      .filter((expense) => expense.type === "transferencia")
+      .reduce((acc, expense) => acc + expense.amount, 0);
+
+    const totalOutgoingTransfers = expenses
+      .filter(
+        (expense) => expense.type === "transferencia" && expense.amount < 0,
+      )
+      .reduce((acc, expense) => acc + expense.amount, 0);
+
+    const totalOutgoing = totalCompra + totalOutgoingTransfers;
+
+    const totalCompraYTransferencias = totalCompra + totalTransferencias;
+
+    return {
+      totalCompra,
+      totalOutgoingTransfers,
+      totalOutgoing,
+      totalTransferencias,
+      totalCompraYTransferencias,
+    };
+  }, [expenses]);
+};
+
+const SummaryRow: React.FC<{ expenses: SheetExpenseRecord[] }> = ({
+  expenses,
+}) => {
+  const {
+    totalCompra,
+    totalOutgoingTransfers,
+    totalOutgoing,
+    totalTransferencias,
+    totalCompraYTransferencias,
+  } = useExpenseSummary(expenses);
+
+  return (
+    <div className="flex justify-between bg-white p-4">
+      <div className="flex gap-4">
+        <span className="">Total Compras:</span>{" "}
+        <ExpenseBadge amount={totalCompra} />
+      </div>
+      <div className="flex gap-4">
+        <span className="">Total Transferencias Salientes:</span>{" "}
+        <ExpenseBadge amount={totalOutgoingTransfers} />
+      </div>
+      <div className="flex gap-4">
+        <span className="">Total Salidas:</span>{" "}
+        <ExpenseBadge amount={totalOutgoing} />
+      </div>
+      <div className="flex gap-4">
+        <span className="">Total Transferencias:</span>{" "}
+        <ExpenseBadge amount={totalTransferencias} />
+      </div>
+      <div className="flex gap-4">
+        <span className="">Total Compras y Transferencias:</span>{" "}
+        <ExpenseBadge amount={totalCompraYTransferencias} />
+      </div>
+    </div>
+  );
+};
+
 const ExpensesTable: React.FC<{ expenses: SheetExpenseRecord[] }> = ({
   expenses,
 }) => {
@@ -92,52 +158,55 @@ const ExpensesTable: React.FC<{ expenses: SheetExpenseRecord[] }> = ({
   console.log("🚀 ~ table:", table.getRowModel().rows);
 
   return (
-    // TODO: Wrap in flex to fill 100% height
-    <div className="~max-h-[40rem]/[36rem] overflow-auto bg-white">
-      <table className="min-w-full divide-y divide-gray-200 overflow-y-auto">
-        <thead className="bg-gray-50">
-          {table.getHeaderGroups().map((headerGroup) => (
-            <tr key={headerGroup.id}>
-              {headerGroup.headers.map((header) => (
-                <th
-                  key={header.id}
-                  scope="col"
-                  className="cursor-pointer px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 transition-colors duration-200 hover:bg-gray-100"
-                  onClick={header.column.getToggleSortingHandler()}
-                >
-                  <div className="flex items-center">
-                    {flexRender(
-                      header.column.columnDef.header,
-                      header.getContext(),
-                    )}
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                  </div>
-                </th>
-              ))}
-            </tr>
-          ))}
-        </thead>
-        <tbody className="divide-y divide-gray-200 bg-white">
-          {table.getRowModel().rows.map((row, index) => (
-            <motion.tr
-              key={row.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: index * 0.05 }}
-              className="transition-colors duration-200 hover:bg-gray-50"
-            >
-              {row.getVisibleCells().map((cell) => (
-                <td
-                  key={cell.id}
-                  className="whitespace-nowrap px-6 py-4 text-sm text-gray-500"
-                >
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </td>
-              ))}
-            </motion.tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="flex flex-col">
+      <SummaryRow expenses={expenses} />
+      {/* // TODO: Wrap in flex to fill 100% height */}
+      <div className="~max-h-[40rem]/[36rem] overflow-auto bg-white">
+        <table className="min-w-full divide-y divide-gray-200 overflow-y-auto">
+          <thead className="bg-gray-50">
+            {table.getHeaderGroups().map((headerGroup) => (
+              <tr key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <th
+                    key={header.id}
+                    scope="col"
+                    className="cursor-pointer px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 transition-colors duration-200 hover:bg-gray-100"
+                    onClick={header.column.getToggleSortingHandler()}
+                  >
+                    <div className="flex items-center">
+                      {flexRender(
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
+                      <ArrowUpDown className="ml-2 h-4 w-4" />
+                    </div>
+                  </th>
+                ))}
+              </tr>
+            ))}
+          </thead>
+          <tbody className="divide-y divide-gray-200 bg-white">
+            {table.getRowModel().rows.map((row, index) => (
+              <motion.tr
+                key={row.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: index * 0.05 }}
+                className="transition-colors duration-200 hover:bg-gray-50"
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <td
+                    key={cell.id}
+                    className="whitespace-nowrap px-6 py-4 text-sm text-gray-500"
+                  >
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </td>
+                ))}
+              </motion.tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
