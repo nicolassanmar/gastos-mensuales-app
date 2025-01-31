@@ -52,9 +52,6 @@ const columns = [
       </div>
     ),
   }),
-  columnHelper.accessor("currency", {
-    header: "Moneda",
-  }),
   columnHelper.accessor("type", {
     header: "Tipo",
   }),
@@ -104,7 +101,7 @@ const SummaryRow: React.FC<{ expenses: SheetExpenseRecord[] }> = ({
   } = useExpenseSummary(expenses);
 
   return (
-    <div className="flex justify-between bg-white p-4">
+    <div className="flex flex-wrap justify-between border-b-2 bg-white p-4">
       <div className="flex gap-4">
         <span className="">Total Compras:</span>{" "}
         <ExpenseBadge amount={totalCompra} />
