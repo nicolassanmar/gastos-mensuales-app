@@ -3,36 +3,19 @@ import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
-  getPaginationRowModel,
-  Table,
   useReactTable,
 } from "@tanstack/react-table";
-import {
-  ArrowUpDown,
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
-} from "lucide-react";
-import { SheetExpenseRecord } from "~/utils/types";
+import { ArrowUpDown } from "lucide-react";
+import type { SheetExpenseRecord } from "~/utils/types";
 import { motion } from "framer-motion";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "./ui/pagination";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import React, { useEffect, useMemo, useState } from "react";
-import { useExpensesFromDB, UseExpensesFromDBResult } from "~/utils/storage";
+import { useExpensesFromDB } from "~/utils/storage";
 import {
   Select,
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "./ui/select";

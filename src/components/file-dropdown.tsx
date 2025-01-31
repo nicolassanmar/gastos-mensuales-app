@@ -1,6 +1,6 @@
-import React, { useCallback } from "react";
+import { useCallback } from "react";
 import { useDropzone } from "react-dropzone";
-import { Upload, File } from "lucide-react";
+import { Upload } from "lucide-react";
 import { motion } from "framer-motion";
 import { mkExpenseRecords } from "~/utils/process-sheet";
 import { joinItauRediva } from "~/utils/process-sheet/join-itau-rediva";
@@ -36,16 +36,15 @@ export const FileDropdown = () => {
     [onFilesUploaded],
   );
 
-  const { getRootProps, getInputProps, isDragActive, acceptedFiles } =
-    useDropzone({
-      onDrop,
-      accept: {
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [
-          ".xlsx",
-        ],
-        "application/vnd.ms-excel": [".xls"],
-      },
-    });
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: {
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [
+        ".xlsx",
+      ],
+      "application/vnd.ms-excel": [".xls"],
+    },
+  });
 
   return (
     <motion.div

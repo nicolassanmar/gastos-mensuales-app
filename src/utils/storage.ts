@@ -1,6 +1,6 @@
-import { useQuery, UseQueryResult } from "@tanstack/react-query";
-import { SheetExpenseRecord } from "./types";
-import { openDB, deleteDB, wrap, unwrap, DBSchema } from "idb";
+import { useQuery, type UseQueryResult } from "@tanstack/react-query";
+import { type SheetExpenseRecord } from "./types";
+import { openDB, type DBSchema } from "idb";
 
 const expensesDBKey = "ExpensesDB";
 const expensesStoreKey = "expenses";
