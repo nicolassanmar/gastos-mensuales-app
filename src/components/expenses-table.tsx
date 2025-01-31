@@ -25,6 +25,17 @@ import {
   PaginationPrevious,
 } from "./ui/pagination";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import React, { useEffect, useState } from "react";
+import { useExpensesFromDB, UseExpensesFromDBResult } from "~/utils/storage";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
 
 const noDecimalFormatter = Intl.NumberFormat(undefined, {
   maximumFractionDigits: 0,
@@ -189,22 +200,93 @@ const ExpensesTable: React.FC<{ expenses: SheetExpenseRecord[] }> = ({
   );
 };
 
-export const ExpensesTableWithTabs: React.FC<{
-  expensesUYU: SheetExpenseRecord[];
-  expensesUSD: SheetExpenseRecord[];
-}> = ({ expensesUSD, expensesUYU }) => {
+export const ExpensesTableWithTabs: React.FC = () => {
+  const [selectedMonthYear, setSelectedMonthYear] = useState<string | null>(
+    null,
+  );
+
+  const [selectedExpensesUYU, setSelectedExpensesUYU] = useState<
+    SheetExpenseRecord[]
+  >([]);
+
+  const [selectedExpensesUSD, setSelectedExpensesUSD] = useState<
+    SheetExpenseRecord[]
+  >([]);
+
+  const { data, isLoading } = useExpensesFromDB();
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+  if (!data) {
+    return null;
+  }
+  const { expensesUYU, expensesUSD } = data;
+
+  // TODO: inefficient, since we are sorting all the dates when we could get the first one
+  const yearMonthSet = new Set([
+    ...expensesUYU.map((expense) => expense.yearMonth),
+    ...expensesUSD.map((expense) => expense.yearMonth),
+  ]);
+  console.log("🚀 ~ yearMonthSet:", yearMonthSet);
+
+  const sortedMonthYears = Array.from(yearMonthSet)
+    .map((yearMonth) => ({
+      key: yearMonth,
+      // Use 3rd day of the month to avoid timezone issues going back to the previous month
+      date: new Date(`${yearMonth}-03`),
+    }))
+    .sort((a, b) => b.date.getTime() - a.date.getTime());
+
+  console.log("🚀 ~ sortedMonthYears:", sortedMonthYears);
   return (
     <>
       <Tabs defaultValue="UYU">
-        <TabsList>
-          <TabsTrigger value="UYU">UYU</TabsTrigger>
-          <TabsTrigger value="USD">USD</TabsTrigger>
-        </TabsList>
+        <div className="flex justify-between">
+          <TabsList>
+            <TabsTrigger value="UYU">UYU</TabsTrigger>
+            <TabsTrigger value="USD">USD</TabsTrigger>
+          </TabsList>
+
+          <Select
+            value={selectedMonthYear}
+            defaultValue={sortedMonthYears[0].key}
+            onValueChange={(value) => {
+              setSelectedMonthYear(value);
+              // TODO: Fix inefficient filtering here using a map
+              setSelectedExpensesUYU(
+                expensesUYU.find((expense) => expense.yearMonth === value)
+                  ?.expenses ?? [],
+              );
+              setSelectedExpensesUSD(
+                expensesUSD.find((expense) => expense.yearMonth === value)
+                  ?.expenses ?? [],
+              );
+            }}
+          >
+            <SelectTrigger className="w-[180px] bg-white">
+              <SelectValue placeholder="Elige el mes" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                {sortedMonthYears.map((monthYear) => (
+                  <SelectItem key={monthYear.key} value={monthYear.key}>
+                    {monthYear.date
+                      .toLocaleString("default", {
+                        month: "long",
+                        year: "numeric",
+                      })
+                      .replace(/^\w/, (c) => c.toUpperCase())}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
         <TabsContent value="UYU">
-          <ExpensesTable expenses={expensesUYU} />
+          <ExpensesTable expenses={selectedExpensesUYU} />
         </TabsContent>
         <TabsContent value="USD">
-          <ExpensesTable expenses={expensesUSD} />
+          <ExpensesTable expenses={selectedExpensesUSD} />
         </TabsContent>
       </Tabs>
     </>

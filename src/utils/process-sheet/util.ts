@@ -1,3 +1,4 @@
+import { getCellValue } from "./xlsx-util";
 import * as XLSX from "xlsx";
 import { Bank, SheetExpenseRecord } from "../types";
 import { string } from "zod";
@@ -111,19 +112,28 @@ export const processSheet = (
     .map((row) => {
       const debitValue = -Math.abs(
         Number.parseFloat(
-          sheet[XLSX.utils.encode_cell({ r: row, c: cells.debitCell.c })]?.v,
+          getCellValue(
+            sheet,
+            XLSX.utils.encode_cell({ r: row, c: cells.debitCell.c }),
+          ),
         ),
       );
       const creditValue = Math.abs(
         Number.parseFloat(
-          sheet[XLSX.utils.encode_cell({ r: row, c: cells.creditCell.c })]?.v,
+          getCellValue(
+            sheet,
+            XLSX.utils.encode_cell({ r: row, c: cells.creditCell.c }),
+          ),
         ),
       );
-      const dateString: string =
-        sheet[XLSX.utils.encode_cell({ r: row, c: cells.dateCell.c })]?.v;
-      const concept = sheet[
-        XLSX.utils.encode_cell({ r: row, c: cells.conceptCell.c })
-      ]?.v as string;
+      const dateString: string = getCellValue(
+        sheet,
+        XLSX.utils.encode_cell({ r: row, c: cells.dateCell.c }),
+      );
+      const concept = getCellValue(
+        sheet,
+        XLSX.utils.encode_cell({ r: row, c: cells.conceptCell.c }),
+      ) as string;
 
       console.log({ row, debitValue, creditValue, dateString, concept });
 

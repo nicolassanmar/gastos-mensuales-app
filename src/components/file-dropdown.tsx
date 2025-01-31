@@ -7,7 +7,7 @@ import { joinItauRediva } from "~/utils/process-sheet/join-itau-rediva";
 import { writeExpensesToDB } from "~/utils/storage";
 import { useQueryClient } from "@tanstack/react-query";
 
-const useOnFilesUploaded = () => {
+const useProcessUploadedFiles = () => {
   const queryClient = useQueryClient();
 
   return async (files: File[]) => {
@@ -27,7 +27,7 @@ const useOnFilesUploaded = () => {
 };
 
 export const FileDropdown = () => {
-  const onFilesUploaded = useOnFilesUploaded();
+  const onFilesUploaded = useProcessUploadedFiles();
 
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {

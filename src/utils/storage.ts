@@ -84,12 +84,51 @@ const filterExpenses = (expenses: SheetExpenseRecord[]) => {
   //     return expense.amount !== 0;
   //   });
 };
+type ExpenseYearMonth = {
+  yearMonth: string;
+  expenses: SheetExpenseRecord[];
+  currency: string;
+};
+
+type UseExpensesFromDBResult = UseQueryResult<{
+  expensesUYU: ExpenseYearMonth[];
+  expensesUSD: ExpenseYearMonth[];
+}>;
+
+function groupExpensesPerMonthAndYear(
+  expenses: SheetExpenseRecord[],
+  currency: string,
+): ExpenseYearMonth[] {
+  const map = new Map<
+    string,
+    {
+      yearMonth: string;
+      expenses: SheetExpenseRecord[];
+      currency: string;
+    }
+  >();
+
+  for (const expense of expenses) {
+    const date = new Date(expense.date);
+    const year = date.getFullYear();
+    const monthWidhPadding = (date.getMonth() + 1).toString().padStart(2, "0");
+    const key = `${year}-${monthWidhPadding}`;
+
+    if (!map.has(key)) {
+      map.set(key, {
+        yearMonth: key,
+        expenses: [],
+        currency,
+      });
+    }
+    map.get(key)!.expenses.push(expense);
+  }
+
+  return Array.from(map.values());
+}
 
 /** React query hook to retrieve all expenses from the db */
-export function useExpensesFromDB(): UseQueryResult<{
-  expensesUSD: SheetExpenseRecord[];
-  expensesUYU: SheetExpenseRecord[];
-}> {
+export function useExpensesFromDB(): UseExpensesFromDBResult {
   return useQuery({
     queryKey: expensesQueryKey,
     queryFn: async () => {
@@ -105,9 +144,14 @@ export function useExpensesFromDB(): UseQueryResult<{
         IDBKeyRange.lowerBound(["USD", new Date()], true),
       );
       return {
-        // return most recent expenses first
-        expensesUSD: filterExpenses(expensesUSD).reverse(),
-        expensesUYU: filterExpenses(expensesUYU).reverse(),
+        expensesUSD: groupExpensesPerMonthAndYear(
+          filterExpenses(expensesUSD).reverse(),
+          "USD",
+        ),
+        expensesUYU: groupExpensesPerMonthAndYear(
+          filterExpenses(expensesUYU).reverse(),
+          "UYU",
+        ),
       };
     },
   });
