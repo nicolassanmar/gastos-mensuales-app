@@ -3,9 +3,11 @@ import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
+  getSortedRowModel,
+  Header,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown } from "lucide-react";
+import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 import type { SheetExpenseRecord } from "~/utils/types";
 import { motion } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
@@ -40,6 +42,7 @@ const columns = [
   columnHelper.accessor("date", {
     header: "Fecha",
     cell: ({ row }) => <div>{row.original.date.toLocaleDateString()}</div>,
+    sortDescFirst: false,
   }),
   columnHelper.accessor("concept", {
     header: "Concepto",
@@ -126,6 +129,21 @@ const SummaryRow: React.FC<{ expenses: SheetExpenseRecord[] }> = ({
   );
 };
 
+const SortIcon: React.FC<{ header: Header<SheetExpenseRecord, unknown> }> = ({
+  header,
+}) => {
+  const onClick = () => {
+    header.column.toggleSorting();
+  };
+  if (header.column.getIsSorted() === "asc") {
+    return <ArrowUp className="h-4 w-4" onClick={onClick} />;
+  }
+  if (header.column.getIsSorted() === "desc") {
+    return <ArrowDown className="h-4 w-4" onClick={onClick} />;
+  }
+  return <ArrowUpDown className="h-4 w-4" onClick={onClick} />;
+};
+
 const ExpensesTable: React.FC<{ expenses: SheetExpenseRecord[] }> = ({
   expenses,
 }) => {
@@ -133,6 +151,7 @@ const ExpensesTable: React.FC<{ expenses: SheetExpenseRecord[] }> = ({
     data: expenses,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
   });
 
   console.log("🚀 ~ table:", table.getRowModel().rows);
@@ -153,12 +172,12 @@ const ExpensesTable: React.FC<{ expenses: SheetExpenseRecord[] }> = ({
                     className="cursor-pointer px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 transition-colors duration-200 hover:bg-gray-100"
                     onClick={header.column.getToggleSortingHandler()}
                   >
-                    <div className="flex items-center">
+                    <div className="flex items-center gap-2">
                       {flexRender(
                         header.column.columnDef.header,
                         header.getContext(),
                       )}
-                      <ArrowUpDown className="ml-2 h-4 w-4" />
+                      <SortIcon header={header} />
                     </div>
                   </th>
                 ))}
