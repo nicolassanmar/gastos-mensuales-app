@@ -20,11 +20,12 @@ const createContext = cache(async () => {
     headers: heads,
   });
 });
+// CURRENTLY UNUSED
 
-const getQueryClient = cache(createQueryClient);
-const caller = createCaller(createContext);
+// const getQueryClient = cache(createQueryClient);
+// const caller = createCaller(createContext);
 
-export const { trpc: api, HydrateClient } = createHydrationHelpers<AppRouter>(
-  caller,
-  getQueryClient
-);
+// export const { trpc: api, HydrateClient } = createHydrationHelpers<AppRouter>(
+//   caller,
+//   getQueryClient
+// );
