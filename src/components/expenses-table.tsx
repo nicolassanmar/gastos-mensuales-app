@@ -213,9 +213,9 @@ const ExpensesTable: React.FC<{ expenses: SheetExpenseRecord[] }> = ({
 export const ExpensesTableWithTabs: React.FC = () => {
   const { data, isLoading } = useExpensesFromDB();
 
-  const [selectedMonthYear, setSelectedMonthYear] = useState<string | null>(
-    null,
-  );
+  const [selectedMonthYear, setSelectedMonthYear] = useState<
+    string | undefined
+  >(undefined);
 
   useEffect(() => {
     if (data && !selectedMonthYear) {
@@ -225,7 +225,7 @@ export const ExpensesTableWithTabs: React.FC = () => {
         return;
       }
       if (!latestUYUexpense) {
-        setSelectedMonthYear(latestUSDexpense ?? null);
+        setSelectedMonthYear(latestUSDexpense ?? undefined);
         return;
       }
       if (!latestUSDexpense) {
@@ -301,7 +301,7 @@ export const ExpensesTableWithTabs: React.FC = () => {
           </TabsList>
 
           <Select
-            value={selectedMonthYear ?? ""}
+            value={selectedMonthYear}
             defaultValue={sortedMonthYears[0].key}
             onValueChange={(value) => {
               setSelectedMonthYear(value);
