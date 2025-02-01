@@ -15,15 +15,10 @@ export const getCellValue = (
     ?.v;
 };
 
-export const getCellValueAsStringOrThrow = (
+export const getCellValueAsString = (
   sheet: XLSX.WorkSheet,
   cellAddress: XLSX.CellAddress | string,
 ): string => {
   const value = getCellValue(sheet, cellAddress);
-  if (value === undefined) {
-    throw new Error(
-      `Value at cell ${JSON.stringify(cellAddress)} is undefined`,
-    );
-  }
   return z.coerce.string().parse(value);
 };
