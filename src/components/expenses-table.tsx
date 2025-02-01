@@ -160,7 +160,7 @@ const ExpensesTable: React.FC<{ expenses: SheetExpenseRecord[] }> = ({
     <div className="flex flex-col">
       <SummaryRow expenses={expenses} />
       {/* // TODO: Wrap in flex to fill 100% height */}
-      <div className="~max-h-[40rem]/[36rem] overflow-auto bg-white">
+      <div className="overflow-auto bg-white ~max-h-[40rem]/[36rem]">
         <table className="min-w-full divide-y divide-gray-200 overflow-y-auto">
           <thead className="bg-gray-50">
             {table.getHeaderGroups().map((headerGroup) => (
@@ -211,10 +211,35 @@ const ExpensesTable: React.FC<{ expenses: SheetExpenseRecord[] }> = ({
 };
 
 export const ExpensesTableWithTabs: React.FC = () => {
-  const [selectedMonthYear, setSelectedMonthYear] = useState<string>(
-    new Date().toISOString().slice(0, 7),
-  );
   const { data, isLoading } = useExpensesFromDB();
+
+  const [selectedMonthYear, setSelectedMonthYear] = useState<string | null>(
+    null,
+  );
+
+  useEffect(() => {
+    if (data && !selectedMonthYear) {
+      const latestUYUexpense = data.expensesUYU[0]?.yearMonth;
+      const latestUSDexpense = data.expensesUSD[0]?.yearMonth;
+      if (!latestUYUexpense && !latestUSDexpense) {
+        return;
+      }
+      if (!latestUYUexpense) {
+        setSelectedMonthYear(latestUSDexpense ?? null);
+        return;
+      }
+      if (!latestUSDexpense) {
+        setSelectedMonthYear(latestUYUexpense);
+        return;
+      }
+      // compare the two strings and get the latest
+      setSelectedMonthYear(
+        latestUYUexpense > latestUSDexpense
+          ? latestUYUexpense
+          : latestUSDexpense,
+      );
+    }
+  }, [data, selectedMonthYear]);
 
   const [selectedExpensesUYU, setSelectedExpensesUYU] = useState<
     SheetExpenseRecord[]
