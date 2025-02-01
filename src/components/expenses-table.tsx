@@ -301,7 +301,7 @@ export const ExpensesTableWithTabs: React.FC = () => {
           </TabsList>
 
           <Select
-            value={selectedMonthYear}
+            value={selectedMonthYear ?? ""}
             defaultValue={sortedMonthYears[0].key}
             onValueChange={(value) => {
               setSelectedMonthYear(value);
