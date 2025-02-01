@@ -1,7 +1,7 @@
 import { Bank, SheetExpenseRecord } from "~/utils/types";
 import * as XLSX from "xlsx";
 import { processSheet } from "./util";
-import { getCellValue } from "./xlsx-util";
+import { getCellValueAsString } from "./xlsx-util";
 
 export const processItau = (sheet: XLSX.WorkSheet): SheetExpenseRecord[] => {
   const bank = "ITAU";
@@ -11,7 +11,8 @@ export const processItau = (sheet: XLSX.WorkSheet): SheetExpenseRecord[] => {
   const conceptCell = XLSX.utils.decode_cell("C7");
 
   // library does not properly type this
-  const currency = getCellValue(sheet, "F5") === "Dólares" ? "USD" : "UYU";
+  const currency =
+    getCellValueAsString(sheet, "F5") === "Dólares" ? "USD" : "UYU";
 
   return processSheet(sheet, bank, currency, {
     debitCell,
@@ -50,7 +51,7 @@ export const processSantander = (
   const dateCell = XLSX.utils.decode_cell("B15");
   const conceptCell = XLSX.utils.decode_cell("D15");
 
-  const currency = getCellValue(sheet, "E10") === "UYU" ? "UYU" : "USD";
+  const currency = getCellValueAsString(sheet, "E10") === "UYU" ? "UYU" : "USD";
 
   return processSheet(sheet, bank, currency, {
     debitCell,

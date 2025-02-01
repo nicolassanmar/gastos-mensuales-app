@@ -3,7 +3,7 @@ import { z } from "zod";
 
 type XLSXCellObjectUndefined = XLSX.CellObject | undefined;
 
-export const getCellValue = (
+const getCellValue = (
   sheet: XLSX.WorkSheet,
   cellAddress: XLSX.CellAddress | string,
 ) => {
