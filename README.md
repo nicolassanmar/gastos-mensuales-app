@@ -9,4 +9,4 @@ Actualmente tiene soporte para subir estados de cuenta de:
 - Santander
 - Scotiabank
 
-![image](https://github.com/user-attachments/assets/32d30d23-58ab-4bb3-98a0-1e7eecb5e772)
+![image](https://github.com/user-attachments/assets/9c337a9e-6d88-4fab-a696-9559c6b0b592)
