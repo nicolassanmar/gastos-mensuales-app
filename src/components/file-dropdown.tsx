@@ -56,18 +56,18 @@ export const FileDropdown = () => {
         {...getRootProps()}
         className={`cursor-pointer rounded-lg border-2 border-dashed p-4 text-center transition-all duration-300 ${
           isDragActive
-            ? "scale-105 border-red-200 bg-primary/10"
-            : "hover:scale-102 border-white bg-white/10 backdrop-blur-xl hover:border-red-200 hover:bg-white/20"
+            ? "scale-105 border-slate-300 bg-primary/10"
+            : "hover:scale-102 border-white bg-white/10 backdrop-blur-xl hover:border-slate-300 hover:bg-white/20"
         }`}
       >
         <input {...getInputProps()} />
         <Upload className="mx-auto mb-4 h-12 w-12 text-white" />
-        <p className="mb-2 text-lg font-semibold text-gray-700">
+        <p className="mb-2 text-lg font-semibold text-white">
           {isDragActive
             ? "Suelta los archivos aquí..."
             : "Arrastra tus estados de cuenta aquí"}
         </p>
-        <p className="text-sm text-gray-600">o haz click para seleccionar</p>
+        <p className="text-sm text-gray-200">o haz click para seleccionar</p>
       </div>
     </motion.div>
   );

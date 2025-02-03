@@ -30,7 +30,7 @@ const ExpenseBadge: React.FC<{ amount: number }> = ({ amount }) => (
   <Badge
     // outline has no animation
     variant="outline"
-    className={`text-right ${amount >= 0 ? "bg-green-500" : "bg-purple-500"} rounded px-2 py-1 text-white`}
+    className={`text-right ${amount >= 0 ? "bg-lime-700" : "bg-slate-700"} rounded px-2 py-1 text-white`}
   >
     {noDecimalFormatter.format(amount)}
   </Badge>
