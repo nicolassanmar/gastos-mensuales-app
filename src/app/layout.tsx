@@ -22,7 +22,7 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body
-        className={`${inter.className} min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-teal-900`}
+        className={`${inter.className} min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-cyan-700`}
       >
         <div className="container mx-auto px-4 py-8">
           <Providers>{children}</Providers>
