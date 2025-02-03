@@ -288,7 +288,7 @@ export const ExpensesTableWithTabs: React.FC = () => {
     .sort((a, b) => b.date.getTime() - a.date.getTime());
 
   if (!sortedMonthYears[0]) {
-    return <div>No expenses found</div>;
+    return <div className="text-gray-300">Ningún gasto registrado</div>;
   }
 
   return (
