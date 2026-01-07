@@ -4,15 +4,15 @@ import {
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
-  Header,
+  type Header,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
+import { ArrowDown, ArrowUp, ArrowUpDown, Trash2 } from "lucide-react";
 import type { SheetExpenseRecord } from "~/utils/types";
 import { motion } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import React, { useEffect, useMemo, useState } from "react";
-import { useExpensesFromDB } from "~/utils/storage";
+import { useExpensesFromDB, useDeleteExpense } from "~/utils/storage";
 import {
   Select,
   SelectContent,
@@ -21,6 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
+import { Button } from "./ui/button";
 
 const noDecimalFormatter = Intl.NumberFormat(undefined, {
   maximumFractionDigits: 0,
@@ -38,7 +39,7 @@ const ExpenseBadge: React.FC<{ amount: number }> = ({ amount }) => (
 
 const columnHelper = createColumnHelper<SheetExpenseRecord>();
 
-const columns = [
+const createColumns = (onDelete: (id: string) => void) => [
   columnHelper.accessor("date", {
     header: "Fecha",
     cell: ({ row }) => <div>{row.original.date.toLocaleDateString()}</div>,
@@ -60,6 +61,30 @@ const columns = [
   }),
   columnHelper.accessor("bank", {
     header: "Banco",
+  }),
+  columnHelper.display({
+    id: "actions",
+    header: "Acciones",
+    cell: ({ row }) => {
+      const expenseId = row.original.id;
+      return (
+        <div className="flex justify-center">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              if (expenseId) {
+                onDelete(expenseId);
+              }
+            }}
+            className="h-8 w-8 p-0 text-red-600 hover:bg-red-50 hover:text-red-700"
+            title="Eliminar gasto"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
+      );
+    },
   }),
 ];
 
@@ -147,6 +172,19 @@ const SortIcon: React.FC<{ header: Header<SheetExpenseRecord, unknown> }> = ({
 const ExpensesTable: React.FC<{ expenses: SheetExpenseRecord[] }> = ({
   expenses,
 }) => {
+  const deleteExpense = useDeleteExpense();
+
+  const handleDelete = React.useCallback(
+    (id: string) => {
+      if (window.confirm("¿Estás seguro de que deseas eliminar este gasto?")) {
+        deleteExpense.mutate(id);
+      }
+    },
+    [deleteExpense],
+  );
+
+  const columns = useMemo(() => createColumns(handleDelete), [handleDelete]);
+
   const table = useReactTable({
     data: expenses,
     columns,

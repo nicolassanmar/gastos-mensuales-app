@@ -1,6 +1,7 @@
 export type Bank = "ITAU" | "SCOTIABANK" | "SANTANDER";
 
 export type SheetExpenseRecord = {
+  id?: string;
   date: Date;
   amount: number;
   concept: string;

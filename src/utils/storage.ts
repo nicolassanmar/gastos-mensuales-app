@@ -1,4 +1,4 @@
-import { useQuery, type UseQueryResult } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, type UseQueryResult } from "@tanstack/react-query";
 import { type SheetExpenseRecord } from "./types";
 import { openDB, type DBSchema } from "idb";
 
@@ -153,6 +153,20 @@ export function useExpensesFromDB(): UseExpensesFromDBResult {
           "UYU",
         ),
       };
+    },
+  });
+}
+
+/** React query hook to delete an expense from the db */
+export function useDeleteExpense() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      await removeExpenseFromDB(id);
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: expensesQueryKey });
     },
   });
 }
