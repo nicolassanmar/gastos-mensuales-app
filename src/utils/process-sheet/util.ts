@@ -1,6 +1,6 @@
 import { getCellValueAsString } from "./xlsx-util";
 import * as XLSX from "xlsx";
-import { Bank, SheetExpenseRecord } from "../types";
+import { type Bank, type SheetExpenseRecord } from "../types";
 import { string } from "zod";
 
 export type HeaderCells = {

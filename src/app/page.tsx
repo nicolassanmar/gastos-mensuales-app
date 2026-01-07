@@ -1,8 +1,6 @@
 "use client";
-import Link from "next/link";
 import { ExpensesTableWithTabs } from "~/components/expenses-table";
 import { FileDropdown } from "~/components/file-dropdown";
-import { useExpensesFromDB } from "~/utils/storage";
 
 export default function HomePage() {
   return (

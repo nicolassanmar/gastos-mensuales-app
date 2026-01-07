@@ -1,4 +1,4 @@
-import { SheetExpenseRecord } from "../types";
+import { type SheetExpenseRecord } from "../types";
 import { compareEqualRecords } from "./util";
 
 /**  Itau separa REDIVA y compra y es complicado de entender sin juntar.*/

@@ -1,4 +1,4 @@
-import { Bank, SheetExpenseRecord } from "~/utils/types";
+import { type Bank, type SheetExpenseRecord } from "~/utils/types";
 import * as XLSX from "xlsx";
 import { processSheet } from "./util";
 import { getCellValueAsString } from "./xlsx-util";
