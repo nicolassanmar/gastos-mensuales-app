@@ -45,8 +45,8 @@ const ExpenseBadge: React.FC<{ amount: number }> = ({ amount }) => (
 const StatisticsPage = () => {
   const { data, isLoading } = useExpensesFromDB();
   const [dateRange, setDateRange] = useState<DateRange>({
-    from: undefined,
-    to: undefined,
+    from: new Date(2025, 0, 1), // January 1, 2025
+    to: new Date(), // Current date
   });
 
   // Filter and aggregate expenses based on date range
